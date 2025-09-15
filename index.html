@@ -1,0 +1,266 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width,initial-scale=1" />
+  <title>For Trapti — Quick thing</title>
+  <style>
+    /* Reset & base */
+    *{box-sizing:border-box;margin:0;padding:0}
+    html,body{height:100%}
+    body{
+      font-family:Inter, Poppins, system-ui, sans-serif;
+      background:#0f1724;
+      color:#e5eaf5;
+      display:flex;align-items:center;justify-content:center;
+      padding:20px;
+    }
+
+    /* Container */
+    .card {
+      width:100%;
+      max-width:420px;
+      background: rgba(255,255,255,0.04);
+      border-radius:16px;
+      padding:20px;
+      box-shadow: 0 10px 30px rgba(0,0,0,0.6);
+      backdrop-filter: blur(6px);
+      position:relative;
+      overflow:hidden;
+    }
+
+    h1{font-size:20px;margin-bottom:6px;color:#fff}
+    p.lead{color:#cfd5e3;margin-bottom:12px;font-size:14px}
+    section{display:none}
+    section.active{display:block}
+    .center {text-align:center}
+
+    /* Buttons */
+    .btn {
+      background:#ff3c78;border:none;color:#fff;padding:12px 18px;border-radius:10px;font-weight:600;
+      box-shadow: 0 6px 18px rgba(255,60,120,0.22);
+      cursor:pointer;font-size:15px;margin:8px;
+      transition:transform .18s ease, box-shadow .18s ease;
+    }
+    .btn:hover{transform:translateY(-4px);box-shadow:0 10px 30px rgba(255,60,120,0.28)}
+    .btn.ghost{background:transparent;border:1px solid rgba(255,255,255,0.15);color:#cfd5e3}
+
+    /* Quiz styles */
+    .q-card{background:rgba(255,255,255,0.05);padding:14px;border-radius:12px;margin:12px 0}
+    .options{display:flex;flex-direction:column;gap:10px;margin-top:10px}
+    .opt-btn{background:#1f2937;border:none;color:#fff;padding:12px;border-radius:10px;text-align:left;cursor:pointer;font-weight:600}
+    .opt-btn:hover{background:#2c3645}
+    .progress{height:8px;background:rgba(255,255,255,0.08);border-radius:999px;overflow:hidden;margin-top:12px}
+    .progress > i{display:block;height:100%;width:0%;background:linear-gradient(90deg,#ff3c78,#ff8ba3);transition:width .5s ease}
+
+    /* Compliment card */
+    .compliment-card{
+      background:rgba(0,0,0,0.35);
+      padding:14px;border-radius:12px;margin-top:12px;color:#fff;
+      box-shadow: 0 8px 20px rgba(0,0,0,0.5);
+    }
+
+    /* Button area (for chase) */
+    .btn-area{position:relative;height:40vh;display:flex;align-items:center;justify-content:center}
+    #yesBtn,#noBtn{position:absolute;padding:14px 18px;border-radius:12px;font-weight:700}
+    #yesBtn{left:50%;transform:translateX(-120%)}
+    #noBtn{left:60%;transform:translateX(0)}
+
+    /* small text */
+    small.note{display:block;color:#9aa1b9;margin-top:10px;font-size:12px}
+
+    /* confetti */
+    .confetti{position:fixed;top:-20px;width:10px;height:14px;border-radius:2px;opacity:0.95;pointer-events:none;z-index:9999;animation:fall linear forwards}
+    @keyframes fall{to{transform:translateY(110vh) rotate(360deg);opacity:.8}}
+
+    /* responsive */
+    @media (max-width:460px){
+      .card{padding:16px;border-radius:14px}
+      .btn{padding:12px 16px;font-size:15px}
+      .btn-area{height:34vh}
+      h1{font-size:18px}
+    }
+  </style>
+</head>
+<body>
+  <div class="card" id="app">
+
+    <!-- QUIZ START -->
+    <section id="quiz" class="active">
+      <h1>I wanna know — how well do you know me?</h1>
+      <p class="lead">Just a little quiz before anything else. No pressure.</p>
+      <div class="q-card">
+        <div class="progress"><i id="progBar"></i></div>
+        <div id="qText" style="margin-top:12px;font-weight:700">Question</div>
+        <div class="options" id="opts"></div>
+        <small class="note" id="qNote">Answer honestly. Or don’t.</small>
+      </div>
+      <div style="text-align:center">
+        <button class="btn ghost" id="skipQuiz">Skip quiz</button>
+      </div>
+    </section>
+
+    <!-- QUIZ RESULT -->
+    <section id="quizResult">
+      <h1 id="qrTitle">Your Score</h1>
+      <p class="lead" id="qrMsg"></p>
+      <div class="compliment-card" id="qrCompliment"></div>
+      <div style="text-align:center">
+        <button class="btn" id="proceedBtn">Proceed ></button>
+        <button class="btn ghost" id="retakeBtn">Retake</button>
+      </div>
+    </section>
+
+    <!-- ANALYZE -->
+    <section id="analyze">
+      <h1 id="typeTitle">Analyzing…</h1>
+      <p class="lead" id="typeSub">Just checking your vibe 😏</p>
+    </section>
+
+    <!-- PLAY -->
+    <section id="play">
+      <h1>Trapti, quick one.</h1>
+      <p class="lead">Wanna hang out (date) sometime?</p>
+      <div class="btn-area" id="btnArea">
+        <button id="yesBtn" class="btn">YES 😉</button>
+        <button id="noBtn" class="btn ghost">NO 🙃</button>
+      </div>
+      <small class="note">Tip: try to click NO — if you can.</small>
+    </section>
+
+    <!-- COMPLIMENTS -->
+    <section id="compliments">
+      <h1>Alright, some honest compliments</h1>
+      <div style="text-align:center">
+        <button class="btn" id="genCompliment">Generate</button>
+        <button class="btn ghost" id="moreGames">More fun</button>
+      </div>
+      <div class="compliment-card" id="complimentOut"></div>
+    </section>
+
+    <!-- EXTRA FUN -->
+    <section id="extra">
+      <h1>More fun — pick an option</h1>
+      <div class="q-card">
+        <div>What do you love more?</div>
+        <div class="options">
+          <button class="opt-btn" onclick="showMini('Me','Correct 😉')">Me</button>
+          <button class="opt-btn" onclick="showMini('Me','Correct 😏')">Me</button>
+        </div>
+      </div>
+      <div class="q-card">
+        <div>Pizza or Burger (with me)?</div>
+        <div class="options">
+          <button class="opt-btn" onclick="showMini('Pizza','Pizza + me = unbeatable 😌')">Pizza</button>
+          <button class="opt-btn" onclick="showMini('Burger','Good choice but not chosen 😉')">Burger</button>
+        </div>
+      </div>
+      <div id="miniOut" class="compliment-card"></div>
+      <div style="text-align:center;margin-top:10px">
+        <button class="btn" onclick="nextSection('extra','finale')">Finish ></button>
+      </div>
+    </section>
+
+    <!-- FINALE -->
+    <section id="finale">
+      <h1>Well played, Trapti.</h1>
+      <p class="lead">You survived my little test, answered correctly, and now owe me coffee.</p>
+      <div class="compliment-card" id="finalCompliment"></div>
+      <p style="margin-top:12px;font-weight:700">
+        Idk but kaisi lagi tujhe, hopefully achi lagi ho — <span>bhutkiii</span>
+      </p>
+      <div style="text-align:center;margin-top:14px">
+        <button class="btn" onclick="burstConfetti()">Celebrate</button>
+        <button class="btn ghost" onclick="startOver()">Start over</button>
+      </div>
+    </section>
+  </div>
+
+  <script>
+    const quizQuestions = [
+      { q: "First love — what's my first love?", opts:["Cricketer","Gamer"], correct:"Cricketer" },
+      { q: "Who is my favourite cricketer?", opts:["MSD","Virat"], correct:"Virat" },
+      { q: "What's my favourite food?", opts:["Pizza","Burger"], correct:"Pizza" },
+      { q: "What's my favourite thing?", opts:["You","Also you"], correct:"You" }
+    ];
+
+    const compliments = [
+      "Trapti, hotter than my phone at 2AM 😌",
+      "Filters would quit their jobs for you 😏",
+      "Honestly, you’re Wi-Fi level essential 😉",
+      "Sarcasm + you = unfair combo 🙄",
+      "At 5'2, you prove perfection doesn’t need height 💫"
+    ];
+
+    let qIndex=0, score=0;
+    function show(id){
+      document.querySelectorAll('section').forEach(s=>s.classList.remove('active'));
+      document.getElementById(id).classList.add('active');
+    }
+
+    function renderQuestion(){
+      const q=quizQuestions[qIndex];
+      document.getElementById('qText').innerText=q.q;
+      const opts=document.getElementById('opts');opts.innerHTML='';
+      q.opts.forEach(o=>{
+        const b=document.createElement('button');b.className='opt-btn';b.innerText=o;
+        b.onclick=()=>handleAnswer(o);opts.appendChild(b);
+      });
+      document.getElementById('progBar').style.width=Math.round((qIndex/quizQuestions.length)*100)+'%';
+      document.getElementById('qNote').innerText=`Question ${qIndex+1} of ${quizQuestions.length}`;
+    }
+    function handleAnswer(o){
+      const c=quizQuestions[qIndex].correct;
+      const isCorrect=(o===c)||(quizQuestions[qIndex].q.includes("thing")&&o.toLowerCase().includes("you"));
+      if(isCorrect)score++;qIndex++;
+      if(qIndex<quizQuestions.length)renderQuestion();else finishQuiz();
+    }
+    function finishQuiz(skipped=false){
+      show('quizResult');
+      document.getElementById('qrTitle').innerText=skipped?"You skipped":"You scored "+score+"/"+quizQuestions.length;
+      document.getElementById('qrMsg').innerText=skipped?"Too impatient? Fine.":"Good effort 😏";
+      document.getElementById('qrCompliment').innerText=compliments[Math.floor(Math.random()*compliments.length)];
+    }
+    document.getElementById('skipQuiz').onclick=()=>finishQuiz(true);
+    document.getElementById('proceedBtn').onclick=()=>{
+      show('analyze');
+      setTimeout(()=>{
+        show('play');
+        setupChase();
+      },1000);
+    };
+    document.getElementById('retakeBtn').onclick=()=>startQuiz();
+
+    function startQuiz(){qIndex=0;score=0;renderQuestion();show('quiz');}
+    function startOver(){qIndex=0;score=0;startQuiz();}
+
+    function setupChase(){
+      const no=document.getElementById('noBtn'),yes=document.getElementById('yesBtn');let tries=0;
+      no.onmouseenter=()=>{tries++;if(tries>3)no.style.display='none';else{no.style.left=Math.random()*200+'px';no.style.top=Math.random()*200+'px';}};
+      yes.onclick=()=>{burstConfetti(80);setTimeout(()=>show('compliments'),700);}
+    }
+
+    document.getElementById('genCompliment').onclick=()=>{
+      document.getElementById('complimentOut').innerText=compliments[Math.floor(Math.random()*compliments.length)];
+      document.getElementById('finalCompliment').innerText="You did great — and yes, 5'2 suits you perfectly.";
+      burstConfetti(40);
+    }
+    document.getElementById('moreGames').onclick=()=>show('extra');
+    function showMini(t,m){document.getElementById('miniOut').innerText=m;burstConfetti(30);}
+    function nextSection(f,t){show(t);}
+    function burstConfetti(count=60){
+      for(let i=0;i<count;i++){
+        const e=document.createElement('div');e.className='confetti';
+        e.style.left=Math.random()*100+'vw';
+        e.style.background=`hsl(${Math.random()*360},70%,60%)`;
+        e.style.width=(6+Math.random()*8)+'px';
+        e.style.height=(8+Math.random()*12)+'px';
+        document.body.appendChild(e);
+        e.style.animationDuration=(2+Math.random()*1.6)+'s';
+        setTimeout(()=>e.remove(),4000);
+      }
+    }
+    window.onload=startQuiz;
+  </script>
+</body>
+</html>
